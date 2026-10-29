@@ -1,0 +1,80 @@
+IF DB_ID('DinnerUltraSimpleDB') IS NULL
+    CREATE DATABASE DinnerUltraSimpleDB;
+GO
+USE DinnerUltraSimpleDB;
+GO
+
+
+IF OBJECT_ID('dbo.table_requirements') IS NOT NULL DROP TABLE dbo.table_requirements;
+CREATE TABLE dbo.table_requirements (
+  item_name       VARCHAR(40) PRIMARY KEY,
+  quantity_needed INT NOT NULL,
+  quantity_owned  INT NOT NULL
+);
+
+
+INSERT INTO dbo.table_requirements (item_name, quantity_needed, quantity_owned) VALUES
+('Placemat',     4, 4),
+('Dinner Plate', 4, 4),
+('Fork',         4, 4),
+('Knife',        4, 4),
+('Spoon',        4, 4),
+('Water Glass',  4, 4),
+('Napkin',       4, 4);
+
+
+SELECT item_name,
+       quantity_needed,
+       quantity_owned,
+       CASE WHEN quantity_owned >= quantity_needed THEN 'OK' ELSE 'NEED TO BUY' END AS status,
+       CASE WHEN quantity_owned >= quantity_needed THEN 0 ELSE quantity_needed - quantity_owned END AS qty_to_buy
+FROM dbo.table_requirements
+ORDER BY item_name;
+
+
+IF OBJECT_ID('dbo.tasks') IS NOT NULL DROP TABLE dbo.tasks;
+CREATE TABLE dbo.tasks (
+  task_id        INT IDENTITY(1,1) PRIMARY KEY,
+  dish_or_phase  VARCHAR(60) NOT NULL,  
+  task_name      VARCHAR(120) NOT NULL,
+  equipment      VARCHAR(20) NOT NULL,  
+  duration_min   INT NOT NULL,
+  offset_end_min INT NOT NULL           
+);
+
+INSERT INTO dbo.tasks VALUES
+('Brisket','Season & sear','Stovetop',15,205),
+('Brisket','Oven braise','Oven',     180,25),
+('Brisket','Rest brisket','Counter',  15,10),
+('Brisket','Slice & plate','Counter', 10,0);
+
+INSERT INTO dbo.tasks VALUES
+('Fish','Prep fish (clean/season)','Counter',10,35),
+('Fish','Bake fish','Oven',                 30,5),
+('Fish','Plate fish','Counter',              5,0);
+
+INSERT INTO dbo.tasks VALUES
+('Apples & Honey','Slice & plate apples with honey','Counter',10,0);
+
+INSERT INTO dbo.tasks VALUES
+('Challah','Mix & knead dough','Counter',20,190),
+('Challah','First rise','Counter',       90,100),
+('Challah','Shape braid','Counter',      15, 85),
+('Challah','Second rise','Counter',      45, 40),
+('Challah','Bake challah','Oven',        30, 10);
+
+INSERT INTO dbo.tasks VALUES
+('Prep','Clean tableware','(N/A)',20,120),
+('Prep','Set the table','(N/A)',  15, 30),
+('Prep','Final plating & bring to table','(N/A)',10,0);
+
+DECLARE @serve_time DATETIME2 = '2025-09-28 18:00:00'; 
+
+SELECT dish_or_phase,
+       task_name,
+       equipment,
+       duration_min,
+       StartTime = DATEADD(MINUTE, -1 * (offset_end_min + duration_min), @serve_time),
+       EndTime   = DATEADD(MINUTE, -1 *  offset_end_min,                  @serve_time)
+FROM dbo.tasks
+ORDER BY StartTime;

@@ -1,0 +1,3 @@
+select Loyalty_Number, Gender, Enrollment_Type, Enrollment_Month, Enrollment_Year, Cancellation_Month, Cancellation_Year FROM dbo.airline_loyalty_customer_history
+WHERE Enrollment_Year = 2018 AND Enrollment_Month BETWEEN 1 AND 4
+ORDER BY Enrollment_Type ASC

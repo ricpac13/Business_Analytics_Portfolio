@@ -1,0 +1,40 @@
+CREATE DATABASE Laundry;
+GO
+USE Laundry;
+GO
+
+CREATE TABLE locations (
+    location_id INT IDENTITY(1,1) PRIMARY KEY,
+    location_name VARCHAR(50) NOT NULL,
+    description VARCHAR(100)
+);
+
+
+INSERT INTO locations (location_name, description)
+VALUES
+('Hamper', 'dirty clothes'),
+('Washer', 'Washing machine'),
+('Dryer', 'Drying machine'),
+('Fold', 'folding'),
+('Drawer', 'storage location');
+
+
+CREATE TABLE do_a_load_of_laundry (
+    task_id INT IDENTITY(1,1) PRIMARY KEY,
+    task_name VARCHAR(50) NOT NULL,
+    time_minutes INT NOT NULL,
+    start_location_id INT NOT NULL,
+    end_location_id INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (start_location_id) REFERENCES locations(location_id),
+    FOREIGN KEY (end_location_id) REFERENCES locations(location_id)
+);
+
+
+INSERT INTO do_a_load_of_laundry (task_name, time_minutes, start_location_id, end_location_id, status)
+VALUES
+('Collect clothes', 5, 1, 2, 'Dirty → Ready to wash'),
+('Wash clothes', 30, 2, 2, 'Clean, wet'),
+('Dry clothes', 45, 2, 3, 'Clean, dry'),
+('Fold clothes', 15, 3, 4, 'Clean, dry, folded'),
+('Put away clothes', 10, 4, 5, 'Clothes stored');
